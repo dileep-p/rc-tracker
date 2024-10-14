@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Tracking Example</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.js"></script> <!-- CryptoJS library for encryption -->
+    <style>
+        .tracking-form {
+            max-width: 500px;
+            margin: 50px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .tracking-form .btn {
+            background-color: #3874ba;
+            color: white;
+        }
+
+        .tracking-form .btn:hover {
+            background-color: #285a8e;
+        }
+
+        .tracking-form .alert {
+            display: none;
+            margin-top: 10px;
+        }
+
+        .tracking-form .alert-success {
+            border-color: green;
+            color: green;
+        }
+
+        .tracking-form .alert-danger {
+            border-color: red;
+            color: red;
+        }
+
+        .closure {
+            cursor: pointer;
+            color: red;
+            padding: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2 class="text-center mt-5">Email Tracking Form</h2>
+        <div class="tracking-form">
+            <div class="form-group">
+                <input type="email" class="form-control" id="emailInput" placeholder="Enter your email">
+                <div class="invalid-feedback">Please enter a valid email address.</div>
+            </div>
+            <button class="btn btn-primary btn-block" id="submitBtn">Submit</button>
+            <div class="alert alert-danger" id="errorAlert">Failed to retrieve tracking number.</div>
+            <div class="alert alert-success" id="successAlert">
+                <span id="trackingNumber"></span>
+                <div class="closure">[Close]</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Function to get OS and Browser Information
+        function getOSAndBrowserInfo() {
+            const userAgent = navigator.userAgent;
+            let os = 'unknown';
+            let browserName = 'unknown';
+
+            if (userAgent.indexOf('Win') !== -1) os = 'windows';
+            else if (userAgent.indexOf('Mac') !== -1) os = 'mac';
+            else if (userAgent.indexOf('X11') !== -1) os = 'unix';
+            else if (userAgent.indexOf('Linux') !== -1) os = 'linux';
+            else if (userAgent.indexOf('Android') !== -1) os = 'android';
+            else if (userAgent.indexOf('iPhone') !== -1 || userAgent.indexOf('iPad') !== -1) os = 'ios';
+
+            if (userAgent.indexOf('Firefox') !== -1) {
+                browserName = 'firefox';
+            } else if (userAgent.indexOf('Edge') !== -1) {
+                browserName = 'edge';
+            } else if (userAgent.indexOf('Chrome') !== -1 && userAgent.indexOf('Safari') !== -1) {
+                browserName = 'chrome';
+            } else if (userAgent.indexOf('Safari') !== -1) {
+                browserName = 'safari';
+            } else if (userAgent.indexOf('MSIE') !== -1 || !!document.documentMode) {
+                browserName = 'ie';
+            } else if (userAgent.indexOf('Trident/') !== -1) {
+                browserName = 'ie';
+            }
+            return `${os} browser ${browserName}`;
+        }
+
+        // Function to encrypt email data
+        function encryptData(data, key) {
+            return CryptoJS.AES.encrypt(data, key, {
+                mode: CryptoJS.mode.ECB,
+                padding: CryptoJS.pad.Pkcs7
+            }).toString();
+        }
+
+        // Function to generate tracking link based on tracking number prefix
+        function generateTrackingLink(trackingNo) {
+    let trackingLink = trackingNo;
+
+    if (trackingNo.startsWith('SF')) {
+        trackingLink = `<a href="https://www.sf-express.com/chn/en/waybill/waybill-detail/${trackingNo}" target="_blank">${trackingNo}</a>`;
+    } else if (trackingNo.startsWith('DH')) {
+        trackingLink = `<a href="https://www.mydhli.com/global-en/home/tracking.html?tracking-id=${trackingNo}&submit=1&ignoreredirect=true" target="_blank">${trackingNo}</a>`;
+    } else if (trackingNo.startsWith('YT')) {
+        trackingLink = `<a href="https://www.yuntrack.com/parcelTracking?id=${trackingNo}" target="_blank">${trackingNo}</a>`;
+    } else if (trackingNo.startsWith('US')) {
+        trackingLink = `<a href="https://tools.usps.com/go/TrackConfirmAction?tLabels=${trackingNo}" target="_blank">${trackingNo}</a>`;
+    }
+
+    return trackingLink;
+}
+
+
+        // Submit function
+        function SubmitFun() {
+            const input = document.getElementById('emailInput');
+            const errorAlert = document.getElementById('errorAlert');
+            const successAlert = document.getElementById('successAlert');
+            const trackingNumber = document.getElementById('trackingNumber');
+
+            if (input.value) {
+                let reg = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (reg.test(input.value)) {
+                    let data = {
+                        client: {
+                            os: getOSAndBrowserInfo()
+                        },
+                        payload: {
+                            email: encryptData(input.value, key)
+                        }
+                    }
+                    fetch('https://oms.gdjztech.com/expose/query/tracking', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(data)
+                    }).then(res => res.json()).then(res => {
+                        console.log(res);
+                        if (res.code == 0 && res.payload != null && res.payload.length > 0) {
+                            // If only one tracking number is provided
+                            if (res.payload.length === 1) {
+                                let trackingNo = res.payload[0].trackingNo;
+                                trackingNumber.innerHTML = `Ringconn sizing kit tracking number: ${generateTrackingLink(trackingNo)}`;
+                            } 
+                            // If two tracking numbers are provided
+                            else if (res.payload.length === 2) {
+                                let trackingNo1 = res.payload[0].trackingNo;
+                                let trackingNo2 = res.payload[1].trackingNo;
+
+                                let trackingLink1 = generateTrackingLink(trackingNo1);
+                                let trackingLink2 = generateTrackingLink(trackingNo2);
+
+                                // Properly insert the two tracking numbers as clickable links
+                                trackingNumber.innerHTML = `Ringconn sizing kit tracking number: ${trackingLink1} <br> Ringconn 2 tracking number: ${trackingLink2}`;
+                            }
+                            successAlert.style.display = 'block';
+                        } else {
+                            errorAlert.style.display = 'block';
+                        }
+                    }).catch(err => {
+                        errorAlert.style.display = 'block';
+                    })
+                } else {
+                    input.classList.add('is-invalid');
+                }
+            } else {
+                input.classList.add('is-invalid');
+            }
+        }
+
+        // Initialization of key and elements
+        var key = CryptoJS.enc.Utf8.parse('d2d352a70316952dc1c23512d3fd52c0');
+        let btn = document.getElementById('submitBtn');
+        let input = document.getElementById('emailInput');
+
+        // Event listeners for button click and form interactions
+        btn.addEventListener('click', SubmitFun);
+        input.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                SubmitFun();
+            }
+        });
+        input.addEventListener('blur', function () {
+            input.classList.remove('is-invalid');
+        });
+        document.querySelector('.closure').addEventListener('click', function () {
+            this.parentNode.style.display = 'none';
+        });
+    </script>
+</body>
+</html>
