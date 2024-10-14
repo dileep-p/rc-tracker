@@ -108,13 +108,13 @@
     let trackingLink = trackingNo;
 
     if (trackingNo.startsWith('SF')) {
-        trackingLink = `<a href="https://www.sf-express.com/chn/en/waybill/waybill-detail/${trackingNo}" target="_blank">${trackingNo}</a>`;
+        trackingLink = `<a href="https://parcelsapp.com/en/tracking/${trackingNo}" target="_blank">${trackingNo}</a>`;
     } else if (trackingNo.startsWith('DH')) {
-        trackingLink = `<a href="https://www.mydhli.com/global-en/home/tracking.html?tracking-id=${trackingNo}&submit=1&ignoreredirect=true" target="_blank">${trackingNo}</a>`;
+        trackingLink = `<a href="https://parcelsapp.com/en/tracking/${trackingNo}" target="_blank">${trackingNo}</a>`;
     } else if (trackingNo.startsWith('YT')) {
         trackingLink = `<a href="https://www.yuntrack.com/parcelTracking?id=${trackingNo}" target="_blank">${trackingNo}</a>`;
     } else if (trackingNo.startsWith('US')) {
-        trackingLink = `<a href="https://tools.usps.com/go/TrackConfirmAction?tLabels=${trackingNo}" target="_blank">${trackingNo}</a>`;
+        trackingLink = `<a href="https://parcelsapp.com/en/tracking/${trackingNo}" target="_blank">${trackingNo}</a>`;
     }
 
     return trackingLink;
