@@ -63,6 +63,17 @@
                 <div class="closure">[Close]</div>
             </div>
         </div>
+            <h3>About This Page</h3>
+            <p>
+                This page Accepts the following information:
+            </p>
+            <ul>
+                <li><strong>Email Address:</strong> The encrypted email address is forwarded to a third-party API [ Same one used by official RC tracker] to obtain tracking information. We do not store any of your personal data on our servers.</li>
+            </ul>
+            <p>
+                I am not collecing any data / email or using any analytics service. This is just a personal project and will be shutdown once the RC finished shipping all KS backers</a>.
+            </p>
+        </div>
     </div>
 
     <script>
@@ -163,6 +174,10 @@
 
                                 // Properly insert the two tracking numbers as clickable links
                                 trackingNumber.innerHTML = `Ringconn sizing kit tracking number: ${trackingLink1} <br> Ringconn 2 tracking number: ${trackingLink2}`;
+                            } 
+                            // if no payload is returned
+                            else {
+                                trackingNumber.innerHTML = 'No tracking number found.';
                             }
                             successAlert.style.display = 'block';
                         } else {
