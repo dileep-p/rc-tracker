@@ -178,7 +178,7 @@
                                 trackingNumber.innerHTML = `Ringconn sizing kit tracking number: ${trackingLink1} <br> Ringconn 2 tracking number: ${trackingLink2}`;
                             } 
                             // if no payload is returned
-                            else {
+                            else if (res.payload.length === 0){
                                 trackingNumber.innerHTML = 'No tracking number found.';
                             }
                             successAlert.style.display = 'block';
