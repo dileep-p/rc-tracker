@@ -128,6 +128,8 @@
         trackingLink = `<a href="https://www.yuntrack.com/parcelTracking?id=${trackingNo}" target="_blank">${trackingNo}</a>`;
     } else if (trackingNo.startsWith('US')) {
         trackingLink = `<a href="https://parcelsapp.com/en/tracking/${trackingNo}" target="_blank">${trackingNo}</a>`;
+    } else {
+        trackingLink = `<a href="https://parcelsapp.com/en/tracking/${trackingNo}" target="_blank">${trackingNo}</a>`;
     }
 
     return trackingLink;
