@@ -179,6 +179,18 @@
                                 // Properly insert the two tracking numbers as clickable links
                                 trackingNumber.innerHTML = `Ringconn sizing kit tracking number: ${trackingLink1} <br> Ringconn 2 tracking number: ${trackingLink2}`;
                             } 
+                            else if (res.payload.length === 3) {
+                                let trackingNo1 = res.payload[0].trackingNo;
+                                let trackingNo2 = res.payload[1].trackingNo;
+                                let trackingNo3 = res.payload[2].trackingNo;
+
+                                let trackingLink1 = generateTrackingLink(trackingNo1);
+                                let trackingLink2 = generateTrackingLink(trackingNo2);
+                                let trackingLink3 = generateTrackingLink(trackingNo3);
+
+                                // Properly insert the three tracking numbers as clickable links
+                                trackingNumber.innerHTML = `Ringconn sizing kit tracking number: ${trackingLink1} <br> Ringconn 2 tracking number [or dock]: ${trackingLink2} <br> Ringconn 2 tracking number [or dock]: ${trackingLink3}`;
+                            } 
                             // if no payload is returned
                             else if (res.payload.length === 0){
                                 trackingNumber.innerHTML = 'No tracking number found.';
